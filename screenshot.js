@@ -100,8 +100,8 @@ var fetchLand = function(){
       return new Date().getTime() - new Date(parcel.last_transferred_at) < 6000000000
     })
     console.log(newSales)
-    _.each(_.orderBy([newSales[0]], ['last_transferred_at'],['asc']), (parcel) => {
-      setTimeout(function(){getScreenshot(parcel.x, parcel.y, parcel.publication.price)},1000)
+    _.each(_.orderBy(newSales, ['last_transferred_at'],['asc']), (parcel) => {
+      getScreenshot(parcel.x, parcel.y, parcel.publication.price)
     })
   })
 }
