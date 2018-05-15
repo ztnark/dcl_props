@@ -1,0 +1,32 @@
+{
+  "name": "screenshot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "screenshot.js",
+  "dependencies": {
+    "dotenv": "^5.0.1",
+    "lodash": "^4.17.10",
+    "png-crop": "0.0.2",
+    "request": "^2.85.0",
+    "screenshot-stream": "^4.2.0",
+    "screenshotapi": "^1.1.2",
+    "twitter": "^1.7.1",
+    "twitter-media": "^0.2.0",
+    "webpage": "^0.3.0",
+    "webshot": "^0.18.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ztnark/dcl_props.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ztnark/dcl_props/issues"
+  },
+  "homepage": "https://github.com/ztnark/dcl_props#readme"
+}
