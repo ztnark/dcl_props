@@ -23,8 +23,9 @@ var Twitter = function() {
     });
   };
 
-  this.uploadMedia = function(cb){
-    fs.readFile("./img/-143x-150.png", function (err, data) {
+  this.uploadMedia = function(mediaPath, cb){
+    console.log(mediaPath)
+    fs.readFile(mediaPath, function (err, data) {
       if (err) throw err;
       this.mediaClient.uploadMedia('image',data,function(err,res){
         cb(res);
@@ -32,15 +33,14 @@ var Twitter = function() {
     }.bind(this));
   }
 
-  this.sendTweet = function(){
-    var text = "test tweet tweet"
-    this.mail(text);
+  this.sendTweet = function(tweet, mediaPath){
+    this.mail(tweet, mediaPath);
   }
 
   
-  this.mail = function(content, done) {
+  this.mail = function(content, mediaPath) {
     console.log("trying to tweet");
-    this.uploadMedia(function(mediaId){
+    this.uploadMedia(mediaPath, function(mediaId){
       this.client.post('statuses/update', {status: content, media_ids: mediaId},  function(error, tweet, response) {
         if(error || !response) {
           console.log('Twitter ERROR:', error)
@@ -51,9 +51,5 @@ var Twitter = function() {
     }.bind(this)); 
   };
 };
-
-var twitter = new Twitter()
-twitter.init()
-twitter.sendTweet()
 
 module.exports = Twitter;

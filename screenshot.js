@@ -51,10 +51,11 @@ const API_KEY = 'eca074da-7fa8-4cdc-b17a-b7949e16a72e';
 var ScreenshotApi = require('screenshotapi');
 var PNGCrop = require('png-crop');
 var Twitter = require('./twitter');
+var request = require('request');
+var _ = require('lodash');
 
 
-
-function getScreenshot(x,y){
+function getScreenshot(x,y, price){
   var captureRequest = {
     url: 'http://35.232.67.126:3000/' + x + '/'+ y + '/detail',
     webdriver: 'chrome',
@@ -66,23 +67,15 @@ function getScreenshot(x,y){
   ScreenshotApi.getScreenshot(
     API_KEY,        // your api key
     captureRequest, // the site to capture and your settings
-    './'            // local path to store the screenshot png
+    './screenshots'            // local path to store the screenshot png
   )
     .then((localFile) => {
       var config1 = { width: 800, height: 400, top: 92, left: 0 };
       // pass a path, a buffer or a stream as the input
-      PNGCrop.crop(localFile, 'img/' + x + 'x' + y + '.png', config1, function (err) {
+      var path = 'img/' + x + 'x' + y + '.png'
+      PNGCrop.crop(localFile, path, config1, function (err) {
         if (err) throw err;
-        if (x === 150 && y === 150){
-          return
-        }else if(x <= 150){
-          x++
-          getScreenshot(x,y)
-        }else{
-          x = -150
-          y++
-          getScreenshot(x,y)
-        }
+        twitter.sendTweet("#decentraland parcel [" + x + ", " + y + "] just sold for " + price + " MANA!\nhttps://market.decentraland.org/" + x + "/" + y + "/detail", path)
         console.log('done!');
       });
       console.log(`Downloaded to ${localFile}`);
@@ -92,6 +85,34 @@ function getScreenshot(x,y){
     });
 }
 
+var fetchLand = function(){
+  console.log('query')
+  request('https://api.market.decentraland.org/api/parcels?limit=12&offset=0&sort_by=created_at&sort_order=asc&status=sold', function (error, response, body) {
+    if(error){console.log(error)}
+    var jsonBody
+    try {
+      jsonBody = JSON.parse(body)
+    } catch(e) {
+        console.log(e); // error in the above string (in this case, yes)!
+    }
+    var parcels = jsonBody.data.parcels
+    var newSales = parcels.filter((parcel) => {
+      return new Date().getTime() - new Date(parcel.last_transferred_at) < 6000000000
+    })
+    console.log(newSales)
+    _.each(_.orderBy([newSales[0]], ['last_transferred_at'],['asc']), (parcel) => {
+      setTimeout(function(){getScreenshot(parcel.x, parcel.y, parcel.publication.price)},1000)
+    })
+  })
+}
+
+
 var twitter = new Twitter()
 twitter.init()
-getScreenshot(-150,-150)
+fetchLand()
+
+setInterval(function(){
+  console.log('query')
+  fetchLand()
+}, 60000)
+
