@@ -56,6 +56,7 @@ var _ = require('lodash');
 
 
 function getScreenshot(x,y, price){
+	console.log("getting ss " + x +  " " + y)
   var captureRequest = {
     url: 'http://35.232.67.126:3000/' + x + '/'+ y + '/detail',
     webdriver: 'chrome',
@@ -87,7 +88,7 @@ function getScreenshot(x,y, price){
 
 var fetchLand = function(){
   console.log('query')
-  request('https://api.market.decentraland.org/api/parcels?limit=12&offset=0&sort_by=created_at&sort_order=asc&status=sold', function (error, response, body) {
+  request('https://api.decentraland.org/v1/parcels?limit=12&offset=0&sort_by=block_time_updated_at&sort_order=desc&status=sold', function (error, response, body) {
     if(error){console.log(error)}
     var jsonBody
     try {
@@ -97,7 +98,7 @@ var fetchLand = function(){
     }
     var parcels = jsonBody.data.parcels
     var newSales = parcels.filter((parcel) => {
-      return new Date().getTime() - new Date(parcel.last_transferred_at) < 6000000000
+	return new Date().getTime() - parcel.last_transferred_at < 600000
     })
     console.log(newSales)
     _.each(_.orderBy(newSales, ['last_transferred_at'],['asc']), (parcel) => {
@@ -114,5 +115,5 @@ fetchLand()
 setInterval(function(){
   console.log('query')
   fetchLand()
-}, 60000)
+}, 600000)
 
